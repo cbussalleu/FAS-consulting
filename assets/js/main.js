@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar Locomotive Scroll
+    const scroll = new LocomotiveScroll({
+        el: document.querySelector('[data-scroll-container]'),
+        smooth: true,
+        smartphone: { smooth: true },
+        tablet: { smooth: true }
+    });
+
+    // Registrar ScrollTrigger con Locomotive Scroll
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Actualizar ScrollTrigger cuando Locomotive Scroll se actualiza
+    scroll.on('scroll', ScrollTrigger.update);
+    
+    // ScrollTrigger usa Locomotive Scroll
+    ScrollTrigger.scrollerProxy('[data-scroll-container]', {
+        scrollTop(value) {
+            return arguments.length ? scroll.scrollTo(value, 0, 0) : scroll.scroll.instance.scroll.y;
+        },
+        getBoundingClientRect() {
+            return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
+        },
+        pinType: document.querySelector('[data-scroll-container]').style.transform ? "transform" : "fixed"
+    });
+    
     // Menú hamburguesa para móvil
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
@@ -10,62 +35,168 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Cambio de estilo del header al hacer scroll
-    window.addEventListener('scroll', function() {
-        const header = document.querySelector('.header');
-        
-        if (window.scrollY > 100) {
-            header.style.background = 'rgba(7, 7, 7, 0.95)';
-            header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.background = 'rgba(7, 7, 7, 0.9)';
-            header.style.boxShadow = 'none';
+    ScrollTrigger.create({
+        trigger: 'body',
+        start: 'top -80px',
+        end: 'bottom top',
+        onUpdate: (self) => {
+            const header = document.querySelector('.header');
+            if (self.direction === 1) {
+                header.style.background = 'rgba(7, 7, 7, 0.95)';
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            } else {
+                header.style.background = 'rgba(7, 7, 7, 0.9)';
+                header.style.boxShadow = 'none';
+            }
         }
     });
     
-    // Animación de elementos al hacer scroll
-    const animateOnScroll = function() {
-        const animatedElements = document.querySelectorAll('.capability-group, .case-card');
-        
-        animatedElements.forEach(element => {
-            const elementPosition = element.getBoundingClientRect().top;
-            const screenPosition = window.innerHeight / 1.3;
-            
-            if (elementPosition < screenPosition) {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
+    // Animación de texto revelado
+    gsap.utils.toArray('.reveal-text').forEach(text => {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: text,
+                scroller: '[data-scroll-container]',
+                start: 'top 80%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none reverse'
             }
         });
-    };
-    
-    // Inicializar animaciones
-    document.querySelectorAll('.capability-group, .case-card').forEach(element => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(50px)';
-        element.style.transition = 'all 0.6s ease';
+        
+        tl.fromTo(text, {
+            y: 100,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: 'power3.out'
+        });
+        
+        tl.fromTo(text.querySelector('::after') || text, {
+            scaleX: 1,
+            transformOrigin: 'left'
+        }, {
+            scaleX: 0,
+            transformOrigin: 'right',
+            duration: 1.2,
+            ease: 'power4.inOut'
+        }, '-=0.2');
     });
     
-    // Ejecutar animaciones al cargar y al hacer scroll
-    window.addEventListener('scroll', animateOnScroll);
-    animateOnScroll();
+    // Animación de elementos al hacer scroll
+    gsap.utils.toArray('.reveal-item').forEach(item => {
+        gsap.fromTo(item, {
+            y: 50,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: item,
+                scroller: '[data-scroll-container]',
+                start: 'top 80%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none reverse'
+            }
+        });
+    });
     
-    // Smooth scroll para enlaces internos
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    // Animación de tarjetas de capacidades
+    gsap.utils.toArray('.capability-group').forEach((card, index) => {
+        gsap.fromTo(card, {
+            y: 100,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            delay: index * 0.1,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '.capabilities-map',
+                scroller: '[data-scroll-container]',
+                start: 'top 80%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none reverse'
+            }
+        });
+    });
+    
+    // Animación de tarjetas de casos
+    gsap.utils.toArray('.case-card').forEach((card, index) => {
+        gsap.fromTo(card, {
+            y: 100,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            delay: index * 0.2,
+            ease: 'power2.out',
+            scrollTrigger: {
+                trigger: '.cases-container',
+                scroller: '[data-scroll-container]',
+                start: 'top 80%',
+                end: 'bottom 20%',
+                toggleActions: 'play none none reverse'
+            }
+        });
+    });
+    
+    // Efecto parallax para fondos
+    document.querySelectorAll('[data-scroll-speed]').forEach(el => {
+        gsap.to(el, {
+            y: (i, target) => parseFloat(target.getAttribute('data-scroll-speed')) * -100,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: el.parentElement,
+                scroller: '[data-scroll-container]',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+    });
+    
+    // Efecto para la sección Hero
+    gsap.timeline()
+        .fromTo('.hero h1', {
+            y: 50,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: 'power3.out'
+        })
+        .fromTo('.hero .subtitle', {
+            y: 30,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power3.out'
+        }, '-=0.5');
+    
+    // Actualizar Locomotive Scroll
+    ScrollTrigger.addEventListener('refresh', () => scroll.update());
+    ScrollTrigger.refresh();
+    
+    // Manejar la navegación con Locomotive Scroll
+    document.querySelectorAll('a[data-scroll-to]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            
             const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
+            scroll.scrollTo(document.querySelector(targetId));
             
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 70,
-                    behavior: 'smooth'
-                });
-                
-                // Cerrar menú móvil si está abierto
-                if (navList.classList.contains('active')) {
-                    navList.classList.remove('active');
-                }
+            // Cerrar menú móvil si está abierto
+            if (navList.classList.contains('active')) {
+                navList.classList.remove('active');
             }
         });
     });
