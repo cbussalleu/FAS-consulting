@@ -125,6 +125,16 @@ a {
     align-items: center;
 }
 
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 30px;
+    margin-right: 10px;
+}
+
 .logo {
     font-family: 'Rubik', sans-serif;
     font-size: 1.5rem;
@@ -193,14 +203,60 @@ a {
     overflow: hidden;
 }
 
-.hero h1 {
-    color: var(--background-white);
-    margin-bottom: var(--spacing-md);
+.hero-content {
+    position: relative;
+    z-index: 2;
 }
 
-.hero .subtitle {
+.pre-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
     color: var(--background-white);
-    opacity: 0.8;
+    margin-bottom: 0;
+}
+
+.title {
+    font-size: 120px;
+    line-height: 1;
+    margin-bottom: 10px;
+    color: var(--background-white);
+}
+
+.subtitle-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.working-in {
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--background-white);
+    margin-bottom: 0;
+}
+
+.changing-subtitle {
+    position: relative;
+    height: 100px;
+    overflow: hidden;
+}
+
+.changing-subtitle .subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 96px;
+    font-weight: 600;
+    color: var(--primary-light);
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.changing-subtitle .subtitle.active {
+    opacity: 1;
 }
 
 .bg-lines {
@@ -219,6 +275,18 @@ a {
     transform: rotate(10deg);
     z-index: 1;
     animation: moveLines 30s linear infinite;
+}
+
+/* Línea roja que aparece debajo del texto cambiante */
+.hero:after {
+    content: '';
+    position: absolute;
+    bottom: 20%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--primary-color);
+    z-index: 1;
 }
 
 @keyframes moveLines {
@@ -417,6 +485,14 @@ a {
     .section {
         padding: var(--spacing-lg) 0;
     }
+    
+    .title {
+        font-size: 80px;
+    }
+    
+    .changing-subtitle .subtitle {
+        font-size: 64px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -451,6 +527,18 @@ a {
     .menu-toggle {
         display: flex;
     }
+    
+    .title {
+        font-size: 60px;
+    }
+    
+    .changing-subtitle .subtitle {
+        font-size: 48px;
+    }
+    
+    .changing-subtitle {
+        height: 60px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -472,5 +560,17 @@ a {
     
     .scenario .number {
         margin-bottom: var(--spacing-xs);
+    }
+    
+    .title {
+        font-size: 40px;
+    }
+    
+    .changing-subtitle .subtitle {
+        font-size: 32px;
+    }
+    
+    .changing-subtitle {
+        height: 40px;
     }
 }
