@@ -8,7 +8,7 @@
     --background-beige: #FFFFE9;
     --background-grey: #FAFAFA;
     --background-white: #FFFFFF;
-    
+
     /* Espaciados */
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
@@ -210,7 +210,7 @@ a {
 
 .pre-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 24px;
+    font-size: 120px; /* Igual que el tamaño del título */
     font-weight: 500;
     color: var(--background-white);
     margin-bottom: 0;
@@ -256,6 +256,7 @@ a {
 }
 
 .changing-subtitle .subtitle.active {
+    color: var(--primary-color); /* Rojo */
     opacity: 1;
 }
 
@@ -574,3 +575,4 @@ a {
         height: 40px;
     }
 }
+
