@@ -51,6 +51,41 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Alternancia de subtítulos
+    const subtitles = document.querySelectorAll('.changing-subtitle .subtitle');
+    let currentSubtitle = 0;
+    
+    function changeSubtitle() {
+        // Quitar clase active de todos los subtítulos
+        subtitles.forEach(subtitle => subtitle.classList.remove('active'));
+        
+        // Añadir clase active al subtítulo actual
+        subtitles[currentSubtitle].classList.add('active');
+        
+        // Actualizar índice para el próximo cambio
+        currentSubtitle = (currentSubtitle + 1) % subtitles.length;
+    }
+    
+    // Cambiar subtítulo cada 3 segundos
+    setInterval(changeSubtitle, 3000);
+    
+    // Animación para la línea roja
+    gsap.fromTo('.hero:after', 
+        { width: 0 },
+        { 
+            width: '100%',
+            duration: 1.5,
+            ease: 'power2.inOut',
+            scrollTrigger: {
+                trigger: '.hero',
+                scroller: '[data-scroll-container]',
+                start: 'top top',
+                end: 'bottom top',
+                toggleActions: 'play none none reverse'
+            }
+        }
+    );
+    
     // Animación de texto revelado
     gsap.utils.toArray('.reveal-text').forEach(text => {
         const tl = gsap.timeline({
@@ -163,7 +198,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Efecto para la sección Hero
     gsap.timeline()
-        .fromTo('.hero h1', {
+        .fromTo('.pre-title', {
+            y: 30,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out'
+        })
+        .fromTo('.title', {
             y: 50,
             opacity: 0
         }, {
@@ -171,24 +215,36 @@ document.addEventListener('DOMContentLoaded', function() {
             opacity: 1,
             duration: 1,
             ease: 'power3.out'
-        })
-        .fromTo('.hero .subtitle', {
+        }, '-=0.4')
+        .fromTo('.working-in', {
             y: 30,
             opacity: 0
         }, {
             y: 0,
             opacity: 1,
             duration: 0.8,
-            stagger: 0.2,
             ease: 'power3.out'
-        }, '-=0.5');
+        }, '-=0.6')
+        .fromTo('.changing-subtitle', {
+            y: 30,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            onComplete: () => {
+                // Activar el primer subtítulo después de la animación
+                document.querySelector('.changing-subtitle .subtitle').classList.add('active');
+            }
+        }, '-=0.4');
     
     // Actualizar Locomotive Scroll
     ScrollTrigger.addEventListener('refresh', () => scroll.update());
     ScrollTrigger.refresh();
     
     // Manejar la navegación con Locomotive Scroll
-    document.querySelectorAll('a[data-scroll-to]').forEach(anchor => {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
